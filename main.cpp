@@ -19,7 +19,6 @@ int main() {
             std::cerr << "frame not grabbed\n";
             exit(EXIT_FAILURE);
         }
-
         // http://localhost:8080/bgr
         std::vector<uchar> buff_bgr;
         cv::imencode(".jpg", frame, buff_bgr);
