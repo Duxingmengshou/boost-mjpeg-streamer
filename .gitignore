@@ -46,6 +46,7 @@ misc.xml
 modules.xml
 vcs.xml
 boost-mjpeg-streamer.iml
+*.mp4
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
 
