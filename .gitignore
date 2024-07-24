@@ -42,7 +42,10 @@
 
 # CMake
 cmake-build-*/
-
+misc.xml
+modules.xml
+vcs.xml
+boost-mjpeg-streamer.iml
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
 
