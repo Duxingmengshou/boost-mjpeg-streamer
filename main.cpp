@@ -1,3 +1,31 @@
 //
 // Created by _thinkPad on 2024/7/24.
 //
+#include <opencv2/opencv.hpp>
+#include "http_server.h"
+
+int main() {
+    http_server hs;
+    hs.run();
+    cv::VideoCapture cap(0);
+    if (!cap.isOpened()) {
+        std::cerr << "VideoCapture not opened\n";
+        exit(EXIT_FAILURE);
+    }
+    while (true) {
+        cv::Mat frame;
+        cap >> frame;
+        if (frame.empty()) {
+            std::cerr << "frame not grabbed\n";
+            exit(EXIT_FAILURE);
+        }
+
+        // http://localhost:8080/bgr
+        std::vector<uchar> buff_bgr;
+        cv::imencode(".jpg", frame, buff_bgr);
+        std::shared_ptr<std::vector<char>> buf = std::make_shared<std::vector<char>>(buff_bgr.begin(), buff_bgr.end());
+        hs.publish("check", buf);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    return 0;
+}
