@@ -115,7 +115,11 @@ void http_server::handle_sn_request(socket_shared_ptr socket,
     res.keep_alive();
     boost::beast::http::response_serializer<boost::beast::http::empty_body> sr{res};
     boost::system::error_code err;
-    boost::beast::http::write_header(*socket, sr);
+    boost::beast::http::write_header(*socket, sr, err);
+    if (err) {
+        std::cerr << "write: " << err.message() << "\n";
+        return;
+    }
 
     while (true) {
         auto const size = frames[sn]->size();
@@ -129,7 +133,7 @@ void http_server::handle_sn_request(socket_shared_ptr socket,
         res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(boost::beast::http::field::content_type, "image/jpeg");
         res.content_length(size);
-        res.keep_alive(req.keep_alive());
+        res.keep_alive(true);
         boost::beast::http::write(*socket, res, err);
         if (err) {
             std::cerr << "write: " << err.message() << "\n";
