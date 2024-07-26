@@ -27,7 +27,7 @@ int main() {
         std::vector<uchar> buff_bgr;
         cv::imencode(".jpg", frame, buff_bgr);
         std::shared_ptr<std::vector<char>> buf =
- std::make_shared<std::vector<char>>(buff_bgr.begin(), buff_bgr.end());
+std::make_shared<std::vector<char>>(buff_bgr.begin(), buff_bgr.end());
         hs.publish("check", buf);
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
