@@ -1,5 +1,7 @@
 #include "http_server.h"
 
+#include <utility>
+
 http_server::http_server() : thread_pool(7) {
     try {
         int port = 8080;
@@ -73,7 +75,7 @@ void http_server::handle_device_request(socket_shared_ptr socket,
     res.keep_alive(req.keep_alive());
     res.body() = "<html><body><h1>Boost MJPEG Streamer</h1></body>";
 
-    for (const auto& c: frames) {
+    for (const auto &c: frames) {
         res.body() += "<body><h2><a href=\"http://127.0.0.1:8080/" + c.first + "\">" + c.first + "</a></h2></body>";
     }
 
@@ -116,16 +118,10 @@ void http_server::handle_sn_request(socket_shared_ptr socket,
     boost::beast::http::write_header(*socket, sr);
 
     while (true) {
-        std::vector<char> local_buffer;
-        {
-            if (!frames.empty()) {
-                local_buffer = frames[sn];
-            }
-        }
-        auto const size = local_buffer.size();
+        auto const size = frames[sn]->size();
         boost::beast::http::response<boost::beast::http::vector_body<char>> res{std::piecewise_construct,
                                                                                 std::make_tuple(
-                                                                                        std::move(local_buffer)),
+                                                                                        *frames[sn]),
                                                                                 std::make_tuple(
                                                                                         boost::beast::http::status::ok,
                                                                                         req.version())};
@@ -139,7 +135,6 @@ void http_server::handle_sn_request(socket_shared_ptr socket,
             std::cerr << "write: " << err.message() << "\n";
             break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(30)); // Adjust the frame rate as needed
     }
 }
 
@@ -166,7 +161,7 @@ void http_server::accept_handler(const boost::system::error_code &ec, socket_sha
 }
 
 void http_server::publish(const std::string &sn, std::shared_ptr<std::vector<char>> frame_shared_ptr) {
-    frames[sn] = std::vector<char>(frame_shared_ptr->begin(), frame_shared_ptr->end());
+    frames[sn] = frame_shared_ptr;
 }
 
 void http_server::close(const std::string &sn) {

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <thread>
 #include <memory>
 #include <vector>
 #include <mutex>
@@ -30,7 +31,7 @@ public:
     io_service_shared_ptr io_service_sp;
     acceptor_shared_ptr acceptor_sp;
     boost::asio::thread_pool thread_pool;
-    std::map<std::string, std::vector<char>> frames;
+    std::map<std::string, std::shared_ptr<std::vector<char>>> frames;
 
 public:
     http_server();

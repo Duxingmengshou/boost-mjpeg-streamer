@@ -1,4 +1,5 @@
 #include <opencv2/opencv.hpp>
+#include <thread>
 #include "http_server.h"
 
 int main() {
